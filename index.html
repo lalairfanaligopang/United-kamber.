@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071b45">
+<link rel="manifest" href="manifest.json">
+
+<link rel="icon" type="image/png" sizes="96x96" href="icons/favicon.png">
+<title>United Kamber Cricket</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#07111f;--card:#101d30;--line:#263957;--blue:#1769d5;--gold:#e8b84d;--txt:#f2f6ff;--muted:#9db0cb;--red:#bd3b4c;--green:#15966f}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#061125,#091728 55%,#06101e);color:var(--txt);font-family:Arial,system-ui,sans-serif}
+button,input,select{font:inherit}button{border:0;color:#fff;border-radius:12px;padding:12px 14px;background:#243653;font-weight:700}button:active{transform:scale(.98)}
+.app{max-width:980px;margin:auto;padding-bottom:80px}.top{position:sticky;top:0;z-index:20;background:linear-gradient(135deg,#06163a,#1257b6);padding:14px 14px 12px;box-shadow:0 5px 20px #0006}.brandRow{display:flex;align-items:center;gap:10px}.brandLogo{width:48px;height:48px;border-radius:12px;object-fit:cover;box-shadow:0 3px 12px #0005;background:#fff}.brand{font-weight:900;font-size:22px;letter-spacing:.5px}.installBtn{display:none;margin-top:10px;background:#e8b84d;color:#07111f;width:100%}.tag{font-size:11px;color:#cbdcff;margin-top:3px}
+.nav{display:flex;gap:7px;overflow:auto;margin-top:12px}.nav button{white-space:nowrap;background:#ffffff18}.nav .on{background:#fff;color:#0a3470}
+main{padding:12px}.view{display:none}.view.on{display:block}.card{background:#0f1c2e;border:1px solid var(--line);border-radius:17px;padding:14px;margin-bottom:12px;box-shadow:0 8px 25px #0003}
+h2,h3{margin:0 0 12px}.small{font-size:12px;color:var(--muted)}.muted{color:var(--muted)}.gold{color:var(--gold)}.center{text-align:center}
+.score{font-size:48px;font-weight:900;text-align:center;letter-spacing:1px}.overs{text-align:center;color:#b8c9e2;margin-top:-5px}.crr{display:flex;justify-content:space-around;color:#b7c8df;font-size:12px;margin-top:10px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.run{background:#185fca}.four{background:#11836d}.six{background:#b56c14}.wk{background:#b9364a}.extra{background:#5f4aac}.save{background:#16865f}.danger{background:#9f2f40}
+input,select{width:100%;padding:12px;border-radius:11px;border:1px solid #304565;background:#0a1728;color:#fff;margin:4px 0 8px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 5px;border-bottom:1px solid #253650;text-align:left}th{color:#a8c8f4}
+.pills{display:flex;gap:7px;flex-wrap:wrap}.pill{background:#1b2d48;padding:7px 10px;border-radius:999px;font-size:12px}
+.ball{display:flex;justify-content:space-between;padding:9px 2px;border-bottom:1px solid #22324a}.ball b{color:#fff}.notice{padding:10px;border-radius:12px;background:#102d4e;color:#cce1ff;font-size:12px}
+.empty{padding:25px;text-align:center;color:#8fa5c2}.two{display:flex;gap:8px}.two>*{flex:1}
+@media(max-width:520px){.score{font-size:40px}.grid{grid-template-columns:repeat(3,1fr)}button{padding:12px 8px}.card{padding:12px}}
+
+/* Theme system */
+body.theme-blue{--bg:#07111f;--card:#0f1c2e;--line:#263957;--blue:#1769d5;--gold:#e8b84d;--txt:#f2f6ff;--muted:#9db0cb}
+body.theme-green{--bg:#061712;--card:#0c211a;--line:#24503e;--blue:#15966f;--gold:#d8b45a;--txt:#f1fff8;--muted:#a5c7b8}
+body.theme-purple{--bg:#10091c;--card:#1b102b;--line:#493269;--blue:#7d4ed6;--gold:#e4b75a;--txt:#faf5ff;--muted:#c1aed4}
+body.theme-red{--bg:#1b090d;--card:#291217;--line:#5b2934;--blue:#c53e56;--gold:#e8b84d;--txt:#fff5f6;--muted:#d2aeb5}
+body.theme-gold{--bg:#151006;--card:#241b0b;--line:#60491c;--blue:#c89222;--gold:#f1ca68;--txt:#fffaf0;--muted:#d0c09d}
+body.theme-light{--bg:#eef3f9;--card:#ffffff;--line:#cbd7e6;--blue:#1769d5;--gold:#b47a08;--txt:#142033;--muted:#617089}
+body{background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg),#000 8%));color:var(--txt)}
+.top{background:linear-gradient(135deg,color-mix(in srgb,var(--blue),#000 55%),var(--blue))}
+.card{background:var(--card);border-color:var(--line)}
+input,select{background:color-mix(in srgb,var(--card),#000 18%);color:var(--txt);border-color:var(--line)}
+.theme-light .top{color:#fff}.theme-light button{color:#fff}.theme-light .notice{background:#e8f1ff;color:#24476d}.theme-light .small,.theme-light .muted{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brandRow"><img class="brandLogo clubLogo" src="logo.png" alt="United Kamber logo"><div><div class="brand">UNITED KAMBER</div><div class="tag">Professional Cricket Scorebook • Offline First</div></div></div>
+  <div class="two" style="margin-top:8px"><button id="installBtn" class="installBtn" onclick="installApp()">📲 INSTALL UNITED KAMBER APP</button><button id="shareBtn" class="save" onclick="shareApp()">📤 SHARE APP</button></div>
+  <div class="nav">
+    <button class="on" data-v="home">Home</button><button data-v="public">🌐 Public Live</button><button data-v="players">Players</button><button data-v="new">New Match</button><button data-v="live">🔐 Scorer Live</button><button data-v="matches">Matches</button><button data-v="stats">Statistics</button><button data-v="media">Photos & Videos</button><button data-v="admins">Admins</button><button data-v="cards">Cards</button><button data-v="settings">Settings</button><button data-v="backup">Backup / Sync</button>
+  </div>
+</header>
+<main>
+<section id="home" class="view on">
+ <div class="card center"><img class="clubLogo" src="logo.png" alt="United Kamber" style="width:min(220px,65vw);border-radius:22px;box-shadow:0 10px 30px #0005"><h2 style="margin-top:12px">UNITED KAMBER</h2><div class="small">Cricket Club Management & Live Scoring</div><div class="notice" style="margin-top:12px">📲 App install karein aur doston ke saath share karein.<br>🌐 <b>PUBLIC LIVE SCORE</b> bina login ke sab dekh sakte hain.<br>🔐 <b>SCORER LOGIN</b> password se scoring ke liye hai.</div><div class="grid2" style="margin-top:10px"><button class="save" onclick="nav('public')">🌐 PUBLIC LIVE SCORE</button><button onclick="nav('admins')">🔐 SCORER LOGIN</button></div></div>
+ <div class="grid2">
+  <div class="card center"><div class="small">PLAYERS</div><h2 id="homePlayers">0</h2></div>
+  <div class="card center"><div class="small">SAVED MATCHES</div><h2 id="homeMatches">0</h2></div>
+ </div>
+ <div class="card"><h3>Quick Start</h3><div class="notice">1. Add your players → 2. Start New Match → 3. Select batsmen/bowler → 4. Score every ball. Everything is stored on this device without internet.</div></div>
+ <div class="card"><h3>Club Records</h3><div id="homeRecords" class="empty">Add players and score matches to build records.</div></div>
+</section>
+
+<section id="public" class="view">
+ <div class="card center"><h2>🌐 United Kamber — Public Live Score</h2><div class="notice">بغیر login کے live score دیکھیں۔ Scoring کے لیے صرف Scorer/Owner login استعمال کریں۔</div></div>
+ <div class="card">
+  <div class="small center" id="publicMatchMeta">Live match loading…</div>
+  <div class="small center" id="publicMatchTitle">UNITED KAMBER</div>
+  <div id="publicScore" class="score">—/—</div>
+  <div id="publicOvers" class="overs">— overs</div>
+  <div class="crr"><span id="publicTarget">Target —</span><span id="publicUpdated">Waiting for live score…</span></div>
+ </div>
+ <div class="card"><h3>Live Match Details</h3><div id="publicDetails" class="empty">No live match is available right now.</div></div>
+ <div class="card"><h3>🔐 Scorer</h3><div class="notice">Scorer password کے ساتھ login کرے گا، پھر ball-by-ball score update کر سکے گا۔</div><button class="save" style="width:100%;margin-top:10px" onclick="nav('admins')">SCORER LOGIN</button></div>
+</section>
+<section id="players" class="view">
+ <div class="card"><h2>Player Register</h2>
+  <div class="grid2"><input id="pName" placeholder="Player name"><input id="pNo" placeholder="Jersey no."></div><label class="small">Player Photo</label><input id="pPhoto" type="file" accept="image/*">
+  <div class="two"><select id="pRole"><option>All-rounder</option><option>Batter</option><option>Bowler</option><option>Wicketkeeper</option></select><button class="save" onclick="addPlayer()">ADD PLAYER</button></div>
+ </div>
+ <div class="card"><table><thead><tr><th>Photo</th><th>#</th><th>Player</th><th>Role</th><th>Runs</th><th>Wkts</th><th></th></tr></thead><tbody id="playersTable"></tbody></table></div>
+</section>
+
+<section id="new" class="view">
+ <div class="card"><h2>New Match</h2>
+  <label class="small">Tournament Name</label><input id="tournament" placeholder="Tournament / League name">
+  <div class="grid2"><div><label class="small">Match Date</label><input id="matchDate" type="date"></div><div><label class="small">Match Time</label><input id="matchTime" type="time"></div></div>
+  <label class="small">Opponent</label><input id="opp" placeholder="Opponent team">
+  <div class="grid2"><div><label class="small">Overs</label><input id="maxOvers" type="number" value="20" min="1"></div><div><label class="small">Venue</label><input id="venue" placeholder="Ground / Venue"></div></div>
+  <label class="small">United Kamber batting players</label><div id="teamPicker" class="pills"></div>
+  <button class="save" style="width:100%;margin-top:10px" onclick="startMatch()">START MATCH</button>
+ </div>
+</section>
+
+<section id="live" class="view">
+ <div class="card">
+  <div class="small center" id="matchMeta">Tournament • Date • Venue</div>
+  <div class="small center" id="matchTitle">UNITED KAMBER vs OPPONENT</div>
+  <div id="liveScore" class="score">0/0</div><div id="liveOvers" class="overs">0.0 overs</div>
+  <div class="crr"><span id="crr">CRR 0.00</span><span id="rrr">RRR —</span><span id="target">Target —</span></div>
+ </div>
+ <div class="card"><h3>Current Batsmen</h3><table><thead><tr><th>Batter</th><th>R</th><th>B</th><th>4</th><th>6</th><th>SR</th></tr></thead><tbody id="batTable"></tbody></table></div>
+ <div class="card"><h3>Current Bowler</h3><div class="grid2"><select id="bowlerSelect"></select><div class="notice" id="bowlerLine">0.0 ov • 0 runs • 0 wkts</div></div></div>
+ <div class="card"><h3>Score Ball</h3><div class="grid">
+  <button class="run" onclick="ball(0)">0</button><button class="run" onclick="ball(1)">1</button><button class="run" onclick="ball(2)">2</button>
+  <button class="run" onclick="ball(3)">3</button><button class="four" onclick="ball(4)">4</button><button class="six" onclick="ball(6)">6</button>
+  <button class="extra" onclick="extra('WD')">WIDE</button><button class="extra" onclick="extra('NB')">NO-BALL</button><button class="extra" onclick="extra('B')">BYE</button>
+  <button class="extra" onclick="extra('LB')">LEG-BYE</button><button class="wk" onclick="openWicket()">WICKET</button><button onclick="undo()">UNDO</button>
+ </div></div>
+ <div class="card"><h3>Over / Ball History</h3><div id="ballLog" class="empty">No balls yet.</div></div>
+ <div class="card"><h3>Live Match</h3><div class="notice">Match ID: <b id="matchId">—</b>. Public live viewing on every phone requires an HTTPS hosted realtime database.</div></div>
+ <div class="card"><div class="grid2"><button class="save" onclick="saveMatch()">SAVE MATCH</button><button class="danger" onclick="endMatch()">END MATCH</button></div></div>
+</section>
+
+<section id="matches" class="view"><div class="card"><h2>Match History</h2><div id="matchList"></div></div></section>
+<section id="stats" class="view"><div class="card"><h2>United Kamber Statistics</h2><div id="statsBox"></div></div></section>
+<section id="media" class="view">
+ <div class="card"><h2>Match Photos & Video Clips</h2><div class="notice">Clips and photos can be attached to the current match. In this offline prototype they are kept on this device. Cloud sharing/download across phones requires hosted storage.</div>
+ <input id="mediaFile" type="file" accept="image/*,video/*" multiple><button class="save" style="width:100%;margin-top:8px" onclick="addMedia()">SAVE TO CURRENT MATCH</button></div>
+ <div class="card"><div id="mediaList" class="empty">No media saved.</div></div>
+</section>
+<section id="cards" class="view">
+ <div class="card"><h2>🏆 Premium Scorecards & Awards</h2>
+  <div class="notice">Match select karein, card design choose karein, phir image generate karke WhatsApp/Facebook par share karein.</div>
+  <label class="small">Match</label><select id="cardMatch"></select>
+  <div class="grid2"><div><label class="small">Card Type</label><select id="cardType"><option value="scorecard">Scorecard</option><option value="motm">Man of the Match</option></select></div><div><label class="small">Design</label><select id="cardDesign"><option value="royal">Royal Blue</option><option value="gold">Blue & Gold</option><option value="dark">Dark Premium</option></select></div></div>
+  <div id="motmPickWrap" style="display:none"><label class="small">Man of the Match</label><select id="motmPlayer"></select></div>
+  <button class="save" style="width:100%;margin-top:10px" onclick="generateCard()">GENERATE CARD</button>
+ </div>
+ <div class="card center"><canvas id="cardCanvas" width="1200" height="1500" style="width:100%;max-width:560px;border-radius:18px;background:#111"></canvas>
+  <div class="grid2" style="margin-top:10px"><button onclick="downloadCard()">DOWNLOAD CARD</button><button class="save" onclick="shareCardWhatsApp()">📤 WHATSAPP</button></div>
+ </div>
+</section>
+<section id="settings" class="view">
+ <div class="card"><h2>☁️ Cloud / Live Sync</h2><div id="cloudSettingsStatus" class="notice">Cloud sync status: checking…</div><button class="save" style="width:100%" onclick="syncNow()">SYNC NOW</button></div>
+ <div class="card"><h2>🎨 Themes & Colors</h2>
+  <div class="notice">App ka theme aur main color yahan se foran change karein. Choice isi phone par save rahegi.</div>
+  <label class="small">Theme</label><select id="themeSelect" onchange="applyTheme(this.value)">
+   <option value="blue">Royal Blue</option><option value="green">Emerald Green</option><option value="purple">Premium Purple</option><option value="red">Crimson Red</option><option value="gold">Luxury Gold</option><option value="light">Light</option>
+  </select>
+  <label class="small">Accent Color</label><div class="grid2">
+   <button onclick="setAccent('#1769d5','#e8b84d')">🔵 Blue</button><button onclick="setAccent('#15966f','#d8b45a')">🟢 Green</button>
+   <button onclick="setAccent('#7d4ed6','#e4b75a')">🟣 Purple</button><button onclick="setAccent('#c53e56','#e8b84d')">🔴 Red</button>
+  </div>
+  <button style="width:100%;margin-top:8px" onclick="resetTheme()">♻️ RESTORE DEFAULT THEME</button>
+ </div>
+ <div class="card"><h2>Club Settings</h2>
+  <div class="notice">Yahan se aap app ke andar United Kamber ka logo khud change kar sakte hain. Logo isi device par save rahega.</div>
+  <div class="center" style="margin:14px 0"><img id="logoPreview" class="clubLogo" src="logo.png" alt="Logo preview" style="width:min(220px,65vw);max-height:220px;object-fit:contain;border-radius:22px;box-shadow:0 10px 30px #0005;background:#fff"></div>
+  <label class="small">New Club Logo</label><input id="clubLogoFile" type="file" accept="image/*">
+  <button class="save" style="width:100%" onclick="saveClubLogo()">SAVE CLUB LOGO</button>
+  <button style="width:100%;margin-top:8px" onclick="resetClubLogo()">RESTORE ORIGINAL LOGO</button>
+  <div class="notice" style="margin-top:10px">Note: app ke andar logo foran change hoga. Home-screen/PWA icon browser mein automatically replace nahi hota; us ke liye packaged icon files update karke app dobara deploy/install karna hota hai.</div>
+ </div>
+</section>
+<section id="admins" class="view">
+ <div class="card"><h2>☁️ Cloud Login</h2>
+  <div class="notice">Owner/Scorer login cloud scoring ke liye hai. Public viewers ko login ki zaroorat nahi.</div>
+  <input id="cloudEmail" type="email" placeholder="Email">
+  <input id="cloudPassword" type="password" placeholder="Password">
+  <div class="grid2"><button class="save" onclick="cloudLogin()">LOGIN</button><button onclick="cloudLogout()">LOGOUT</button></div>
+  <div id="cloudStatus" class="small" style="margin-top:8px">Cloud: checking…</div>
+ </div>
+
+ <div class="card"><h2>Club Admins</h2><div class="notice">Up to 4 admin profiles are prepared. Real multi-phone permissions/login require the cloud backend.</div>
+ <div class="grid2"><input id="adminName" placeholder="Admin name"><select id="adminRole"><option>Owner</option><option>Scorer</option><option>Editor</option><option>Viewer</option></select></div><button class="save" style="width:100%" onclick="addAdmin()">ADD ADMIN</button></div>
+ <div class="card"><div id="adminList"></div></div>
+</section>
+<section id="backup" class="view">
+ <div class="card"><h2>Offline Backup / Device Transfer</h2>
+ <div class="notice">Your data stays on this phone. Use Export to create a backup file. On another phone, open this app and Import that file. This transfers the complete player, match and ball-by-ball database without internet.</div>
+ <button class="save" style="width:100%;margin-top:10px" onclick="exportData()">EXPORT COMPLETE CLUB DATA</button>
+ <input id="importFile" type="file" accept=".json,application/json" style="margin-top:10px">
+ <button style="width:100%" onclick="importData()">IMPORT DATA FROM FILE</button>
+ </div>
+ <div class="card"><h3>Cloud / Multi-phone note</h3><div class="small">The scoring engine is offline-first. Automatic cloud synchronization between phones requires a real hosted database and club login credentials. This package does not pretend to provide cloud sync without that backend.</div></div>
+</section>
+</main>
+</div>
+
+<div id="modal" style="display:none;position:fixed;inset:0;background:#000b;z-index:50;padding:18px">
+ <div class="card" style="max-width:520px;margin:60px auto"><h3 id="modalTitle">Wicket</h3><div id="modalBody"></div><button style="width:100%;margin-top:8px" onclick="closeModal()">CANCEL</button></div>
+</div>
+
+<script>
+const KEY='uk_complete_v1';
+let db={players:[],matches:[],current:null};
+const $=id=>document.getElementById(id);
+function load(){try{let x=localStorage.getItem(KEY);if(x)db=JSON.parse(x)}catch(e){} db.admins=db.admins||[];db.players=(db.players||[]).map(p=>({...p,photo:p.photo||''}));db.settings=db.settings||{};}
+function persist(){localStorage.setItem(KEY,JSON.stringify(db));refresh();broadcastState()}
+const liveChannel=('BroadcastChannel' in window)?new BroadcastChannel('united-kamber-live'):null;
+function broadcastState(){if(liveChannel&&db.current)liveChannel.postMessage(JSON.parse(JSON.stringify(db.current)))}
+if(liveChannel)liveChannel.onmessage=e=>{if(e.data&&db.current&&e.data.id===db.current.id){db.current=e.data;localStorage.setItem(KEY,JSON.stringify(db));renderLive()}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function nav(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));$(v).classList.add('on');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));if(v==='public')loadPublicLive();if(v==='live'){if(!canScoreCloud()){alert('Scorer/Owner login required. Public users should use Public Live.');return nav('public')}renderLive()}if(v==='matches')renderMatches();if(v==='stats')renderStats();if(v==='players')renderPlayers();if(v==='new')renderPicker();if(v==='settings')renderSettings();if(v==='cards')renderCards()}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>nav(b.dataset.v));
+
+function addPlayer(){let n=$('pName').value.trim();if(!n)return alert('Player name enter karein.');let f=$('pPhoto').files[0];let done=photo=>{db.players.push({id:uid(),name:n,number:$('pNo').value.trim(),role:$('pRole').value,photo:photo||'',bat:{runs:0,outs:0,balls:0,fours:0,sixes:0},bowl:{runs:0,wkts:0,balls:0},field:{catches:0}});$('pName').value='';$('pNo').value='';$('pPhoto').value='';persist()};if(f){let r=new FileReader();r.onload=()=>done(r.result);r.readAsDataURL(f)}else done('')}
+function delPlayer(id){if(!confirm('Delete this player?'))return;db.players=db.players.filter(p=>p.id!==id);persist()}
+function renderPlayers(){let t=$('playersTable');t.innerHTML=db.players.length?db.players.map((p,i)=>`<tr><td>${p.photo?`<img src="${p.photo}" style="width:42px;height:42px;object-fit:cover;border-radius:50%">`:'👤'}</td><td>${p.number||i+1}</td><td>${p.name}</td><td>${p.role}</td><td>${p.bat.runs}</td><td>${p.bowl.wkts}</td><td><button onclick="delPlayer('${p.id}')">×</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No players yet.</td></tr>'}
+function renderPicker(){$('teamPicker').innerHTML=db.players.length?db.players.map(p=>`<label class="pill"><input type="checkbox" class="tp" value="${p.id}" checked style="width:auto;margin:0 5px 0 0">${p.name}</label>`).join(''):'<span class="small">Players پہلے add کریں.</span>'}
+
+function startMatch(){
+ let ids=[...document.querySelectorAll('.tp:checked')].map(x=>x.value);if(ids.length<2)return alert('Kam az kam 2 players select karein.');
+ db.current={id:uid(),date:$('matchDate').value||new Date().toISOString().slice(0,10),time:$('matchTime').value||'',tournament:$('tournament').value.trim()||'Tournament',opponent:$('opp').value.trim()||'Opponent',venue:$('venue').value.trim(),maxOvers:+$('maxOvers').value||20,innings:1,target:null,runs:0,wkts:0,balls:0,extras:{wd:0,nb:0,b:0,lb:0},players:ids.map(id=>({id,r:0,b:0,f:0,s:0,out:false,dismissal:''})),striker:0,non:1,bowler:ids[2]||ids[0],bowlers:{},media:[],log:[],history:[]};
+ ids.forEach(id=>db.current.bowlers[id]={balls:0,runs:0,wkts:0});
+ persist();nav('live');
+}
+function active(){return db.current}
+function bat(){return active().players}
+function pName(id){return db.players.find(p=>p.id===id)?.name||'Unknown'}
+function snap(){let c=active();c.history.push(JSON.stringify({...c,history:[]}));if(c.history.length>50)c.history.shift()}
+function addBatRuns(r){let c=active(),b=c.players[c.striker];b.r+=r;b.b++;if(r===4)b.f++;if(r===6)b.s++;c.runs+=r;c.balls++;let bw=c.bowlers[c.bowler];bw.balls++;bw.runs+=r;c.log.push({over:Math.floor((c.balls-1)/6),ball:((c.balls-1)%6)+1,text:`${pName(b.id)} ${r===0?'•':r+' run'+(r>1?'s':'')}`});if(r%2===1)[c.striker,c.non]=[c.non,c.striker];finishBall()}
+function ball(r){if(!active())return alert('Pehle New Match start karein.');snap();addBatRuns(r)}
+function extra(type){if(!active())return alert('Pehle New Match start karein.');snap();let c=active(),bw=c.bowlers[c.bowler];if(type==='WD'||type==='NB'){c.runs++;c.extras[type==='WD'?'wd':'nb']++;bw.runs++;c.log.push({over:Math.floor(c.balls/6),ball:(c.balls%6)+1,text:type==='WD'?'Wide +1':'No-ball +1'});if(type==='NB'){}}
+else{c.runs++;c.extras[type==='B'?'b':'lb']++;c.balls++;bw.balls++;c.log.push({over:Math.floor((c.balls-1)/6),ball:((c.balls-1)%6)+1,text:type==='B'?'Bye +1':'Leg-bye +1'})}finishBall()}
+function finishBall(){let c=active();if(c.balls>0&&c.balls%6===0){[c.striker,c.non]=[c.non,c.striker];c.log.push({over:c.balls/6-1,ball:6,text:'— OVER COMPLETE —'})}persist()}
+function openWicket(){if(!active())return alert('Pehle New Match start karein.');snap();$('modalTitle').textContent='Wicket';$('modalBody').innerHTML=`<select id="dismiss"><option>Bowled</option><option>Caught</option><option>LBW</option><option>Run out</option><option>Stumped</option><option>Hit wicket</option><option>Retired out</option></select><button class="wk" style="width:100%" onclick="confirmWicket()">CONFIRM WICKET</button>`;$('modal').style.display='block'}
+function closeModal(){$('modal').style.display='none'}
+function confirmWicket(){let c=active(),b=c.players[c.striker],d=$('dismiss').value;b.out=true;b.dismissal=d;b.b++;c.wkts++;c.balls++;c.bowlers[c.bowler].balls++;if(d!=='Run out')c.bowlers[c.bowler].wkts++;c.log.push({over:Math.floor((c.balls-1)/6),ball:((c.balls-1)%6)+1,text:`WICKET — ${pName(b.id)} (${d})`});closeModal();persist()}
+function undo(){let c=active();if(!c||!c.history.length)return;let h=JSON.parse(c.history.pop());h.history=c.history;db.current=h;persist()}
+function renderLive(){let c=active();if(!c){$('matchTitle').textContent='No active match';$('matchMeta').textContent='';return}$('matchMeta').textContent=`${c.tournament||'Tournament'} • ${c.date||''}${c.time?' • '+c.time:''} • ${c.venue||'Venue not set'}`;$('matchTitle').textContent=`UNITED KAMBER vs ${c.opponent}`;$('matchId').textContent=c.id;$('liveScore').textContent=`${c.runs}/${c.wkts}`;$('liveOvers').textContent=`${Math.floor(c.balls/6)}.${c.balls%6} overs`;$('crr').textContent='CRR '+(c.balls?(c.runs/(c.balls/6)).toFixed(2):'0.00');$('target').textContent=c.target?'Target '+c.target:'Target —';$('rrr').textContent='RRR —';$('batTable').innerHTML=c.players.filter(x=>x.id===c.players[c.striker].id||x.id===c.players[c.non].id).map(b=>`<tr><td>${pName(b.id)} ${b.out?'✖':''}</td><td>${b.r}</td><td>${b.b}</td><td>${b.f}</td><td>${b.s}</td><td>${b.b?((b.r/b.b)*100).toFixed(1):'0.0'}</td></tr>`).join('');let opts=c.players.map(p=>`<option value="${p.id}" ${p.id===c.bowler?'selected':''}>${pName(p.id)}</option>`).join('');$('bowlerSelect').innerHTML=opts;$('bowlerSelect').onchange=e=>{c.bowler=e.target.value;persist()};let bw=c.bowlers[c.bowler]||{balls:0,runs:0,wkts:0};$('bowlerLine').textContent=`${Math.floor(bw.balls/6)}.${bw.balls%6} ov • ${bw.runs} runs • ${bw.wkts} wkts`;$('ballLog').innerHTML=c.log.length?c.log.slice().reverse().map(x=>`<div class="ball"><span>${x.over+1}.${x.ball}</span><b>${x.text}</b></div>`).join(''):'<div class="empty">No balls yet.</div>'}
+function saveMatch(){let c=active();if(!c)return;if(!db.matches.find(m=>m.id===c.id))db.matches.push(JSON.parse(JSON.stringify(c)));else db.matches=db.matches.map(m=>m.id===c.id?JSON.parse(JSON.stringify(c)):m);persist();alert('Match saved.')}
+function endMatch(){saveMatch();db.current=null;persist();nav('matches')}
+function renderMatches(){$('matchList').innerHTML=db.matches.length?db.matches.slice().reverse().map(m=>`<div class="card"><b>${m.tournament||'Tournament'}</b><div>UNITED KAMBER ${m.runs}/${m.wkts} vs ${m.opponent}</div><div>${m.date||''}${m.time?' • '+m.time:''} • ${Math.floor(m.balls/6)}.${m.balls%6} overs</div><div class="small">📍 ${m.venue||'Venue not set'} • Match ID ${m.id}</div></div>`).join(''):'<div class="empty">No saved matches.</div>'}
+function aggregate(){let a={};db.players.forEach(p=>a[p.id]={p,r:0,o:0,b:0,f:0,s:0,w:0,bb:0,br:0});db.matches.forEach(m=>m.players.forEach(x=>{let z=a[x.id];if(!z)return;z.r+=x.r;z.b+=x.b;z.f+=x.f;z.s+=x.s;z.o+=x.out?1:0}));return Object.values(a)}
+function renderStats(){let a=aggregate();a.sort((x,y)=>y.r-x.r);$('statsBox').innerHTML=`<table><thead><tr><th>Player</th><th>Runs</th><th>Avg</th><th>SR</th><th>4s</th><th>6s</th><th>50+</th><th>100+</th></tr></thead><tbody>${a.map(x=>`<tr><td>${x.p.name}</td><td>${x.r}</td><td>${x.o?(x.r/x.o).toFixed(2):x.r.toFixed(2)}</td><td>${x.b?(100*x.r/x.b).toFixed(1):'0.0'}</td><td>${x.f}</td><td>${x.s}</td><td>${x.r>=50?'✓':'—'}</td><td>${x.r>=100?'✓':'—'}</td></tr>`).join('')}</tbody></table>`}
+
+function renderCards(){
+ const sel=$('cardMatch'); if(!sel)return;
+ sel.innerHTML=db.matches.length?db.matches.slice().reverse().map(m=>`<option value="${m.id}">${m.tournament||'Match'} • UNITED KAMBER ${m.runs}/${m.wkts} vs ${m.opponent}</option>`).join(''):'<option value="">No saved matches</option>';
+ const m=db.matches.find(x=>x.id===sel.value)||db.matches[0];
+ const ps=m?.players||[]; $('motmPlayer').innerHTML=ps.length?ps.map(x=>`<option value="${x.id}">${pName(x.id)} • ${x.r} runs</option>`).join(''):'<option value="">No players</option>';
+ $('motmPickWrap').style.display=$('cardType').value==='motm'?'block':'none';
+}
+$('cardType').onchange=()=>renderCards();
+$('cardMatch').onchange=()=>renderCards();
+function generateCard(){
+ const m=db.matches.find(x=>x.id===$('cardMatch').value)||db.matches[0]; if(!m)return alert('Pehle match save karein.');
+ const cv=$('cardCanvas'),ctx=cv.getContext('2d'),design=$('cardDesign').value;
+ let bg=design==='gold'?'#071a4a':design==='dark'?'#080b14':'#06245f';
+ ctx.fillStyle=bg;ctx.fillRect(0,0,cv.width,cv.height);
+ ctx.fillStyle='#e8b84d';ctx.fillRect(0,0,cv.width,28);ctx.fillRect(0,cv.height-28,cv.width,28);
+ ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='900 70px Arial';ctx.fillText('UNITED KAMBER',cv.width/2,125);
+ ctx.font='700 38px Arial';ctx.fillStyle='#cbdcff';ctx.fillText(m.tournament||'CRICKET MATCH',cv.width/2,185);
+ ctx.font='900 82px Arial';ctx.fillStyle='#fff';ctx.fillText(`${m.runs}/${m.wkts}`,cv.width/2,330);
+ ctx.font='36px Arial';ctx.fillStyle='#d8e4ff';ctx.fillText(`${Math.floor(m.balls/6)}.${m.balls%6} overs  •  vs ${m.opponent}`,cv.width/2,390);
+ if($('cardType').value==='motm'){
+  const pl=m.players.find(x=>x.id===$('motmPlayer').value)||m.players[0];
+  ctx.font='700 34px Arial';ctx.fillStyle='#e8b84d';ctx.fillText('MAN OF THE MATCH',cv.width/2,560);
+  ctx.font='900 62px Arial';ctx.fillStyle='#fff';ctx.fillText(pName(pl.id),cv.width/2,660);
+  ctx.font='500 42px Arial';ctx.fillStyle='#d8e4ff';ctx.fillText(`${pl.r} runs  •  ${pl.b} balls  •  ${pl.f} fours  •  ${pl.s} sixes`,cv.width/2,740);
+ }else{
+  ctx.textAlign='left';ctx.font='900 38px Arial';ctx.fillStyle='#e8b84d';ctx.fillText('TOP PERFORMERS',90,550);
+  let arr=[...m.players].sort((a,b)=>b.r-a.r).slice(0,8);ctx.font='32px Arial';ctx.fillStyle='#fff';arr.forEach((x,i)=>ctx.fillText(`${i+1}. ${pName(x.id)}   ${x.r} (${x.b})`,90,620+i*62));
+ }
+ ctx.textAlign='center';ctx.font='28px Arial';ctx.fillStyle='#aebfe7';ctx.fillText(`${m.date||''}  •  ${m.venue||'United Kamber'}`,cv.width/2,cv.height-90);
+}
+function downloadCard(){const a=document.createElement('a');a.download='United_Kamber_Card.png';a.href=$('cardCanvas').toDataURL('image/png');a.click()}
+async function shareCardWhatsApp(){generateCard();setTimeout(()=>{const m=db.matches.find(x=>x.id===$('cardMatch').value)||db.matches[0];const text=`🏏 United Kamber\n${m?.tournament||'Match'} • ${m?.runs||0}/${m?.wkts||0} vs ${m?.opponent||'Opponent'}\n${APP_URL}`;window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank','noopener')},150)}
+
+function exportData(){let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='United_Kamber_Club_Backup.json';a.click();URL.revokeObjectURL(a.href)}
+function importData(){let f=$('importFile').files[0];if(!f)return alert('Backup JSON file select karein.');let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.players||!x.matches)throw 0;db=x;persist();alert('Complete club data imported.')}catch(e){alert('Invalid backup file.')}};r.readAsText(f)}
+function applyClubLogo(){let src=(db.settings&&db.settings.logo)||'logo.png';document.querySelectorAll('.clubLogo').forEach(i=>i.src=src);let p=$('logoPreview');if(p)p.src=src}
+function renderSettings(){applyClubLogo()}
+function saveClubLogo(){let f=$('clubLogoFile').files[0];if(!f)return alert('Pehle logo image select karein.');if(!f.type.startsWith('image/'))return alert('Sirf image file select karein.');let r=new FileReader();r.onload=()=>{let img=new Image();img.onload=()=>{let max=900,w=img.width,h=img.height;if(w>max||h>max){let scale=Math.min(max/w,max/h);w=Math.round(w*scale);h=Math.round(h*scale)}let c=document.createElement('canvas');c.width=w;c.height=h;let ctx=c.getContext('2d');ctx.drawImage(img,0,0,w,h);db.settings=db.settings||{};db.settings.logo=c.toDataURL('image/jpeg',0.88);persist();applyClubLogo();$('clubLogoFile').value='';alert('Club logo successfully change ho gaya.')};img.src=r.result};r.readAsDataURL(f)}
+function resetClubLogo(){db.settings=db.settings||{};delete db.settings.logo;persist();applyClubLogo();alert('Original United Kamber logo restore ho gaya.')}
+function refresh(){renderPlayers();renderPicker();renderMatches();renderStats();renderAdmins();renderMedia();renderSettings();renderCards();$('homePlayers').textContent=db.players.length;$('homeMatches').textContent=db.matches.length;renderLive()}
+
+function addMedia(){let c=active();if(!c)return alert('Pehle match start karein.');let fs=[...$('mediaFile').files];if(!fs.length)return alert('Photo ya video select karein.');c.media=c.media||[];let pending=fs.length;fs.forEach(f=>{let r=new FileReader();r.onload=()=>{c.media.push({id:uid(),name:f.name,type:f.type,data:r.result,date:new Date().toISOString()});if(--pending===0){persist();renderMedia();alert('Media saved on this device.')}};r.readAsDataURL(f)});}
+function renderMedia(){let c=active();let a=c&&c.media||[];$('mediaList').innerHTML=a.length?a.slice().reverse().map(m=>m.type.startsWith('video')?`<div class="card"><b>${m.name}</b><video controls style="width:100%;max-height:320px;margin-top:8px" src="${m.data}"></video><a download="${m.name}" href="${m.data}"><button style="margin-top:8px">DOWNLOAD CLIP</button></a></div>`:`<div class="card"><b>${m.name}</b><img style="width:100%;max-height:320px;object-fit:contain;margin-top:8px" src="${m.data}"><a download="${m.name}" href="${m.data}"><button style="margin-top:8px">DOWNLOAD PHOTO</button></a></div>`).join(''):'<div class="empty">No media saved.</div>'}
+function addAdmin(){let n=$('adminName').value.trim();if(!n)return alert('Admin name enter karein.');db.admins=db.admins||[];if(db.admins.length>=4)return alert('Maximum 4 admins.');db.admins.push({id:uid(),name:n,role:$('adminRole').value});$('adminName').value='';persist();renderAdmins()}
+function delAdmin(id){db.admins=(db.admins||[]).filter(x=>x.id!==id);persist();renderAdmins()}
+function renderAdmins(){let a=db.admins||[];$('adminList').innerHTML=a.length?a.map(x=>`<div class="ball"><span><b>${x.name}</b><br><span class="small">${x.role}</span></span><button onclick="delAdmin('${x.id}')">×</button></div>`).join(''):'<div class="empty">No admins yet.</div>'}
+let deferredInstallPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;$('installBtn').style.display='block'});
+window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;$('installBtn').style.display='none';});
+async function installApp(){if(!deferredInstallPrompt){alert('Agar Install button nazar nahi aa raha to browser ke menu ⋮ se “Add to Home screen” ya “Install app” choose karein. App ko HTTPS website se kholna zaroori hai.');return}deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;$('installBtn').style.display='none'}
+const APP_URL='https://young-shape-c035.lalairfanaligopang.workers.dev/';
+async function shareApp(){
+  const title='United Kamber Cricket App';
+  const text='🏏 United Kamber Cricket Club App\nLive Score • Players • Matches • Statistics\nApp kholne aur install karne ke liye link: '+APP_URL;
+  try{
+    if(navigator.share){await navigator.share({title,text,url:APP_URL});return;}
+  }catch(e){if(e && e.name==='AbortError')return;}
+  const wa='https://wa.me/?text='+encodeURIComponent(text);
+  window.open(wa,'_blank','noopener');
+}
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+// ---------- Public Live View ----------
+let publicChannel=null;
+function renderPublicScore(s,m){
+  if(!s){$('publicScore').textContent='—/—';$('publicOvers').textContent='— overs';$('publicMatchTitle').textContent='UNITED KAMBER';$('publicMatchMeta').textContent='No live match';$('publicTarget').textContent='Target —';$('publicUpdated').textContent='Waiting for live score…';$('publicDetails').innerHTML='<div class="empty">No live match is available right now.</div>';return;}
+  $('publicScore').textContent=(s.score||0)+'/'+(s.wickets||0);
+  $('publicOvers').textContent=(s.overs??0)+' overs';
+  $('publicTarget').textContent='Target '+(s.target||'—');
+  $('publicUpdated').textContent='Updated '+new Date(s.updated_at||Date.now()).toLocaleTimeString();
+  $('publicMatchTitle').textContent=m?('UNITED KAMBER vs '+(m.opponent||'OPPONENT')):'UNITED KAMBER';
+  $('publicMatchMeta').textContent=m?[m.tournament,m.match_date,m.venue].filter(Boolean).join(' • '):'Live match';
+  $('publicDetails').innerHTML=m?('<div class="pills"><span class="pill">Tournament: '+escapeHtml(m.tournament||'—')+'</span><span class="pill">Opponent: '+escapeHtml(m.opponent||'—')+'</span><span class="pill">Overs: '+escapeHtml(String(m.overs||'—'))+'</span><span class="pill">Status: '+escapeHtml(s.status||'live')+'</span></div>'):'<div class="empty">Live score is available.</div>';
+}
+function escapeHtml(x){return String(x).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+async function loadPublicLive(){
+ if(!supabaseClient){renderPublicScore(null);return;}
+ try{
+  const r=await supabaseClient.from('live_scores').select('match_id,score,wickets,overs,target,innings,status,updated_at').order('updated_at',{ascending:false}).limit(1);
+  if(r.error)throw r.error;
+  const s=r.data?.[0];
+  if(!s){renderPublicScore(null);return;}
+  const m=await supabaseClient.from('matches').select('match_id,tournament,match_date,venue,opponent,overs,status').eq('id',s.match_id).maybeSingle();
+  renderPublicScore(s,m.data||null);
+ }catch(e){$('publicDetails').innerHTML='<div class="notice">Public live score load nahi ho saka: '+escapeHtml(e.message)+'</div>';}
+}
+function subscribePublicLive(){
+ if(!supabaseClient)return;
+ if(publicChannel)supabaseClient.removeChannel(publicChannel);
+ publicChannel=supabaseClient.channel('uk-public-live').on('postgres_changes',{event:'*',schema:'public',table:'live_scores'},()=>{if(document.getElementById('public')?.classList.contains('on'))loadPublicLive();}).subscribe();
+}
+
+// ---------- Supabase Cloud / Realtime ----------
+const SUPABASE_URL='https://vonvnjrrafrdiapaaxys.supabase.co';
+const SUPABASE_KEY='sb_publishable_BRTbv9ziUmmBwWR7IejGDQ_GqWgsmgm';
+const supabaseClient=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true}}):null;
+let cloudUser=null, cloudRole=null, cloudChannel=null;
+function setCloudStatus(msg){if($('cloudStatus'))$('cloudStatus').textContent=msg;if($('cloudSettingsStatus'))$('cloudSettingsStatus').textContent=msg}
+async function getCloudRole(){if(!supabaseClient||!cloudUser)return null;const {data}=await supabaseClient.from('profiles').select('role,full_name').eq('id',cloudUser.id).maybeSingle();cloudRole=data?.role||null;return cloudRole}
+async function cloudLogin(){if(!supabaseClient)return alert('Cloud library load nahi hui.');const email=$('cloudEmail').value.trim(),password=$('cloudPassword').value;if(!email||!password)return alert('Email aur password enter karein.');const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});if(error)return alert(error.message);cloudUser=data.user;await getCloudRole();setCloudStatus('Cloud: '+(cloudUser.email||'logged in')+' • Role: '+(cloudRole||'not assigned'));subscribeCloud();await pullCloudLive();}
+async function cloudLogout(){if(supabaseClient)await supabaseClient.auth.signOut();cloudUser=null;cloudRole=null;if(cloudChannel){await supabaseClient.removeChannel(cloudChannel);cloudChannel=null}setCloudStatus('Cloud: logged out. Public live viewing remains available.')}
+function canScoreCloud(){return cloudRole==='owner'||cloudRole==='scorer'}
+async function ensureCloudMatch(c){if(!supabaseClient||!c)return null;let {data,error}=await supabaseClient.from('matches').select('id,match_id').eq('match_id',c.id).maybeSingle();if(error)throw error;if(!data){const ins=await supabaseClient.from('matches').insert({match_id:c.id,tournament:c.tournament||'',match_date:c.date||null,venue:c.venue||'',opponent:c.opponent||'',overs:c.maxOvers||20,status:'live',live_score:{runs:c.runs,wickets:c.wkts,balls:c.balls,overs:(Math.floor(c.balls/6)+'.'+c.balls%6)}}).select('id,match_id').single();if(ins.error)throw ins.error;data=ins.data}else{const up=await supabaseClient.from('matches').update({tournament:c.tournament||'',match_date:c.date||null,venue:c.venue||'',opponent:c.opponent||'',overs:c.maxOvers||20,status:'live',live_score:{runs:c.runs,wickets:c.wkts,balls:c.balls,overs:(Math.floor(c.balls/6)+'.'+c.balls%6)}}).eq('id',data.id);if(up.error)throw up.error}return data.id}
+async function syncCurrentToCloud(){if(!supabaseClient||!db.current||!canScoreCloud())return;try{const c=db.current;const matchUuid=await ensureCloudMatch(c);const payload={match_id:matchUuid,score:c.runs||0,wickets:c.wkts||0,overs:Number((Math.floor((c.balls||0)/6)+'.'+((c.balls||0)%6)).replace(/^0\./,'0.')),target:c.target||null,innings:1,status:'live',updated_by:cloudUser.id,updated_at:new Date().toISOString()};const {error}=await supabaseClient.from('live_scores').upsert(payload,{onConflict:'match_id'});if(error)throw error;setCloudStatus('☁️ Cloud synced • '+new Date().toLocaleTimeString());}catch(e){console.warn('Cloud sync failed',e);setCloudStatus('⚠️ Cloud sync failed: '+e.message)}}
+async function syncNow(){await syncCurrentToCloud();await pullCloudLive()}
+async function pullCloudLive(){if(!supabaseClient)return;try{const {data,error}=await supabaseClient.from('live_scores').select('match_id,score,wickets,overs,target,innings,status,updated_at').order('updated_at',{ascending:false}).limit(1);if(error)throw error;if(!data?.length){setCloudStatus('☁️ No live score on cloud yet.');return}const s=data[0];if(db.current){db.current.runs=s.score||0;db.current.wkts=s.wickets||0;const ov=String(s.overs||0).split('.');db.current.balls=(parseInt(ov[0]||0)*6)+parseInt(ov[1]||0);db.current.target=s.target||null;localStorage.setItem(KEY,JSON.stringify(db));renderLive()}setCloudStatus('☁️ Live cloud score: '+s.score+'/'+s.wickets+' • '+s.overs+' overs');}catch(e){setCloudStatus('⚠️ Cloud read failed: '+e.message)}}
+function subscribeCloud(){if(!supabaseClient)return;if(cloudChannel)supabaseClient.removeChannel(cloudChannel);cloudChannel=supabaseClient.channel('uk-live-score').on('postgres_changes',{event:'*',schema:'public',table:'live_scores'},payload=>{const s=payload.new||{};if(!s.match_id)return;if(db.current){db.current.runs=s.score||0;db.current.wkts=s.wickets||0;const ov=String(s.overs||0).split('.');db.current.balls=(parseInt(ov[0]||0)*6)+parseInt(ov[1]||0);db.current.target=s.target||null;localStorage.setItem(KEY,JSON.stringify(db));renderLive()}setCloudStatus('🟢 Realtime update • '+new Date().toLocaleTimeString())}).subscribe()}
+if(supabaseClient){subscribePublicLive();supabaseClient.auth.getSession().then(async ({data})=>{if(data.session){cloudUser=data.session.user;await getCloudRole();setCloudStatus('Cloud: '+(cloudUser.email||'logged in')+' • Role: '+(cloudRole||'not assigned'));subscribeCloud();pullCloudLive()}else setCloudStatus('Cloud: public mode • login only for Owner/Scorer scoring.');});supabaseClient.auth.onAuthStateChange(async (_event,session)=>{cloudUser=session?.user||null;if(cloudUser){await getCloudRole();subscribeCloud()}else cloudRole=null})}
+const _oldPersist=persist;persist=function(){_oldPersist();syncCurrentToCloud()};
+function applyTheme(name){db.settings=db.settings||{};db.settings.theme=name||'blue';document.body.className='theme-'+db.settings.theme;const sel=$('themeSelect');if(sel)sel.value=db.settings.theme;localStorage.setItem(KEY,JSON.stringify(db));}
+function setAccent(blue,gold){db.settings=db.settings||{};db.settings.accent=blue;db.settings.gold=gold;document.documentElement.style.setProperty('--blue',blue);document.documentElement.style.setProperty('--gold',gold);localStorage.setItem(KEY,JSON.stringify(db));}
+function resetTheme(){db.settings=db.settings||{};db.settings.theme='blue';delete db.settings.accent;delete db.settings.gold;document.body.className='theme-blue';document.documentElement.style.removeProperty('--blue');document.documentElement.style.removeProperty('--gold');localStorage.setItem(KEY,JSON.stringify(db));const sel=$('themeSelect');if(sel)sel.value='blue';}
+function initTheme(){db.settings=db.settings||{};const t=db.settings.theme||'blue';document.body.className='theme-'+t;if(db.settings.accent)document.documentElement.style.setProperty('--blue',db.settings.accent);if(db.settings.gold)document.documentElement.style.setProperty('--gold',db.settings.gold);if($('themeSelect'))$('themeSelect').value=t;}
+document.addEventListener('click',e=>{const b=e.target.closest('button[onclick]');if(!b)return;const code=b.getAttribute('onclick')||'';if(/^(ball|extra|openWicket|undo|saveMatch|endMatch)\(/.test(code)&&!canScoreCloud()){e.preventDefault();e.stopImmediatePropagation();alert('Scorer/Owner login required.');nav('admins');}},true);
+load();initTheme();if($('matchDate'))$('matchDate').value=new Date().toISOString().slice(0,10);refresh();
+</script>
+</body></html>

@@ -1,0 +1,9 @@
+{
+  "name":"United Kamber Cricket Club",
+  "short_name":"United Kamber",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#06152d",
+  "theme_color":"#06152d",
+  "icons":[{"src":"logo.png","sizes":"512x512","type":"image/png"}]
+}
